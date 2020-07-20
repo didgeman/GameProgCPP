@@ -5,6 +5,18 @@ Game::Game() {
   mWindow = nullptr;
 }
 
+void Game::ProcessInput() {
+  SDL_Event event;
+  // while there are still events in the queue
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+      case SDL_QUIT:
+        mIsRunning = false;
+        break;
+    }
+  }
+}
+
 bool Game::Initialize() {
   
   int sdlResult = SDL_Init(SDL_INIT_VIDEO);
@@ -30,4 +42,15 @@ bool Game::Initialize() {
   return true;
 }
 
+void Game::RunLoop() {
+  while (mIsRunning) {
+    ProcessInput();
+    // UpdateGame();
+    // GenerateOutput();
+  }
+}
 
+void Game::Shutdown() {
+  SDL_DestroyWindow(mWindow);
+  SDL_Quit();
+}
