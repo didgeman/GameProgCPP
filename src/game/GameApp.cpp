@@ -7,6 +7,12 @@ Game::Game() {
 
 void Game::ProcessInput() {
   SDL_Event event;
+
+  const Uint8* keyb_state = SDL_GetKeyboardState(NULL);
+  // if ESC-key is pressed, then signal game loop to stop running
+  if(keyb_state[SDL_SCANCODE_ESCAPE])
+    mIsRunning = false;
+
   // while there are still events in the queue
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
