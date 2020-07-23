@@ -14,6 +14,23 @@ void Game::GenerateOutput() {
     255 /* alpha */
   );
   SDL_RenderClear(mRenderer);
+
+  SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
+  SDL_Rect wall{
+    0,    // top left x
+    0,    // top left y
+    1024, // width
+    thickness  // height
+  };
+  // draw the top wall
+  SDL_RenderFillRect(mRenderer, &wall);
+
+  // define bottom wall
+  wall.x = 0; wall.y = 768 - thickness; wall.w = 1024; wall.h = thickness;
+  // draw the bottom wall
+  SDL_RenderFillRect(mRenderer, &wall);
+
+  // time to show the resulting image
   SDL_RenderPresent(mRenderer);
 }
 

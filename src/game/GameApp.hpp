@@ -2,6 +2,8 @@
 
 #include "SDL.h"
 
+const int thickness = 15;
+
 class Game {
   public:
     Game();
