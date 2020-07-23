@@ -16,4 +16,5 @@ class Game {
 
     SDL_Window* mWindow;   // reference to our main SDL-window
     bool mIsRunning;       // controls lifetime of our App
+    SDL_Renderer* mRenderer;   // reference to SDL's render system
 };

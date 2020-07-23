@@ -5,6 +5,19 @@ Game::Game() {
   mWindow = nullptr;
 }
 
+void Game::GenerateOutput() {
+  // first set bckground color
+  SDL_SetRenderDrawColor(mRenderer,
+    0,  /* red */
+    0,  /* green */
+    255, /* blue */
+    255 /* alpha */
+  );
+  SDL_RenderClear(mRenderer);
+  SDL_RenderPresent(mRenderer);
+}
+
+
 void Game::ProcessInput() {
   SDL_Event event;
 
@@ -39,11 +52,17 @@ bool Game::Initialize() {
     768,                                // height of window
     0                                   // flags set
   );
-  if (mWindow == nullptr) {
+  if (!mWindow) {
     SDL_Log("Unable to create main window! Errorcode:%s", SDL_GetError());
     return false;
   }
   
+  mRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  if (!mRenderer) {
+    SDL_Log("Unable to create Renderer! Errorcode:%s", SDL_GetError());
+    return false;
+  }
+
   // if we reach here, everything seems fine
   return true;
 }
@@ -52,11 +71,12 @@ void Game::RunLoop() {
   while (mIsRunning) {
     ProcessInput();
     // UpdateGame();
-    // GenerateOutput();
+    GenerateOutput();
   }
 }
 
 void Game::Shutdown() {
+  SDL_DestroyRenderer(mRenderer);
   SDL_DestroyWindow(mWindow);
   SDL_Quit();
 }
