@@ -3,6 +3,10 @@
 Game::Game() {
   mIsRunning = true;
   mWindow = nullptr;
+  mBallPos.x = 512.0f;
+  mBallPos.y = 384.0f;
+  mPaddlePos.x = 10.0f;
+  mPaddlePos.y = 384.0f;
 }
 
 void Game::GenerateOutput() {
@@ -29,6 +33,24 @@ void Game::GenerateOutput() {
   wall.x = 0; wall.y = 768 - thickness; wall.w = 1024; wall.h = thickness;
   // draw the bottom wall
   SDL_RenderFillRect(mRenderer, &wall);
+
+  // the ball
+  SDL_Rect ball {
+    static_cast<int>(mBallPos.x - (ball_width/2)),
+    static_cast<int>(mBallPos.y - (ball_height/2)),
+    ball_width,
+    ball_height
+  };
+  SDL_RenderFillRect(mRenderer, &ball);
+  
+  // the player paddle
+  SDL_Rect paddle{
+    static_cast<int>(mPaddlePos.x - (paddle_width/2)),
+    static_cast<int>(mPaddlePos.y - (paddle_height/2)),
+    paddle_width,
+    paddle_height
+  };
+  SDL_RenderFillRect(mRenderer, &paddle);
 
   // time to show the resulting image
   SDL_RenderPresent(mRenderer);

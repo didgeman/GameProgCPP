@@ -3,6 +3,15 @@
 #include "SDL.h"
 
 const int thickness = 15;
+const int ball_width = 15;
+const int ball_height = 15;
+const int paddle_height = 45;
+const int paddle_width = 15;
+
+struct Vector2 {
+  float x;
+  float y;
+};
 
 class Game {
   public:
@@ -10,6 +19,8 @@ class Game {
     bool Initialize();
     void RunLoop();
     void Shutdown();
+    Vector2 mPaddlePos;
+    Vector2 mBallPos;
   private:
     // game loop helper functions
     void ProcessInput();
