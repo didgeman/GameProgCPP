@@ -1,3 +1,4 @@
+#include <cmath>
 #include "GameApp.hpp"
 
 Game::Game() {
@@ -5,8 +6,26 @@ Game::Game() {
   mWindow = nullptr;
   mBallPos.x = 512.0f;
   mBallPos.y = 384.0f;
+  mBallVelocity = {-200.0f, 235.0f};
   mPaddlePos.x = 10.0f;
   mPaddlePos.y = 384.0f;
+  mCurrentTicks = SDL_GetTicks();
+  mPaddleDir = 0;
+  
+}
+
+/// <summary>
+/// calculates elapsed time since last call of this function
+/// </summary>
+/// <returns>time in seconds</returns>
+float Game::GetElapsedTime() {
+  Uint32 currTime = SDL_GetTicks();
+  float delta = (currTime - mCurrentTicks) / 1000.0f;
+  mCurrentTicks = currTime;   // store current time for next watchstop action in future
+  // clamp maximum delta time ??
+  if (delta > 0.05f)
+    delta = 0.05f;
+  return delta;
 }
 
 void Game::GenerateOutput() {
@@ -64,6 +83,12 @@ void Game::ProcessInput() {
   // if ESC-key is pressed, then signal game loop to stop running
   if(keyb_state[SDL_SCANCODE_ESCAPE])
     mIsRunning = false;
+  // check for paddle movement
+  mPaddleDir = 0;
+  if(keyb_state[SDL_SCANCODE_W])
+    mPaddleDir = -1;
+  if (keyb_state[SDL_SCANCODE_S])
+    mPaddleDir = 1;
 
   // while there are still events in the queue
   while (SDL_PollEvent(&event)) {
@@ -106,10 +131,48 @@ bool Game::Initialize() {
   return true;
 }
 
+void Game::UpdateGame(float deltaTime) {
+  // update the paddle position
+  if (mPaddleDir != 0) {
+    mPaddlePos.y += mPaddleDir * 300.0f * deltaTime;
+    if(mPaddlePos.y < (0 + thickness + paddle_height/2.0f))
+      mPaddlePos.y = thickness + (paddle_height / 2.0f);
+    else if(mPaddlePos.y > (768 - thickness - (paddle_height / 2.0f)))
+      mPaddlePos.y = 768 - thickness - (paddle_height / 2.0f);
+  }
+    
+  // update the ball
+  mBallPos.x += mBallVelocity.x * deltaTime;
+  mBallPos.y += mBallVelocity.y * deltaTime;
+  // check for collisions with the walls
+  if((mBallPos.y - ball_height/2.0f <= 0 + thickness) &&
+      mBallVelocity.y < 0.0f)    // with top wall only when moving upwards
+    mBallVelocity.y = -1 * mBallVelocity.y;
+  if((mBallPos.y + ball_height / 2.0f >= 768 - thickness) &&
+      mBallVelocity.y > 0.0f)    // with bottom wall when moving downwards
+    mBallVelocity.y = -1 * mBallVelocity.y;
+  if(mBallPos.x >= (1024 - ball_width/2.0f))
+    mBallVelocity.x = -1 * mBallVelocity.x;
+
+  // collision with the paddle?
+  if((std::abs(mPaddlePos.y - mBallPos.y) < (paddle_height/2.0f + ball_height/2.0f)) &&
+     mBallPos.x <= mPaddlePos.x + thickness/2.0f)
+    mBallVelocity.x = -1 * mBallVelocity.x;
+
+  // is ball beyond paddle?
+  if (mBallPos.x < 0) {
+    mBallPos.x = 512.0f;
+    mBallPos.y = 384.0f;
+  }
+    
+}
+
 void Game::RunLoop() {
+  float deltaTime;
   while (mIsRunning) {
+    deltaTime = GetElapsedTime();
     ProcessInput();
-    // UpdateGame();
+    UpdateGame(deltaTime);
     GenerateOutput();
   }
 }

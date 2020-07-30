@@ -13,16 +13,16 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\game">
+    <Filter Include="Source Files\Pong">
       <UniqueIdentifier>{876271d9-8708-4264-97e8-d9b1969caa26}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\game\main.cpp">
-      <Filter>Source Files\game</Filter>
+      <Filter>Source Files\Pong</Filter>
     </ClCompile>
     <ClCompile Include="src\game\GameApp.cpp">
-      <Filter>Source Files\game</Filter>
+      <Filter>Source Files\Pong</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

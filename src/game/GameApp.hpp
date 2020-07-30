@@ -21,13 +21,19 @@ class Game {
     void Shutdown();
     Vector2 mPaddlePos;
     Vector2 mBallPos;
+    Vector2 mBallVelocity;
+    int mPaddleDir;
+    float GetElapsedTime();
   private:
     // game loop helper functions
     void ProcessInput();
-    void UpdateGame();    // apply evolve rules to the world
+    void UpdateGame(float deltaTime);    // apply evolve rules to the world
     void GenerateOutput();
+
+    Uint32 mCurrentTicks;
 
     SDL_Window* mWindow;   // reference to our main SDL-window
     bool mIsRunning;       // controls lifetime of our App
     SDL_Renderer* mRenderer;   // reference to SDL's render system
+
 };
