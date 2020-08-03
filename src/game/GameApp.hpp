@@ -19,10 +19,14 @@ class Game {
     bool Initialize();
     void RunLoop();
     void Shutdown();
-    Vector2 mPaddlePos;
+    Vector2 mP1_PaddlePos;
+    int mP1_PaddleDir;
+    Vector2 mP2_PaddlePos;
+    int mP2_PaddleDir;
+
     Vector2 mBallPos;
     Vector2 mBallVelocity;
-    int mPaddleDir;
+    
     float GetElapsedTime();
   private:
     // game loop helper functions
