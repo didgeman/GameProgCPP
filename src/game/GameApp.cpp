@@ -4,9 +4,19 @@
 Game::Game() {
   mIsRunning = true;
   mWindow = nullptr;
-  mBallPos.x = 512.0f;
-  mBallPos.y = 384.0f;
-  mBallVelocity = {-200.0f, 235.0f};
+  mRenderer = nullptr;
+  Vector2 position = {512.0f, 384.0f};
+  Vector2 velocity = { -70.0f, 60.0f };
+  SDL_Color color { 200, 55, 20, 255 };
+  // add first ball
+  balls.push_back(Ball {position, velocity, color});
+  
+  position = { 512.0f, 384.0f };
+  velocity = { 70.0f, 60.0f };
+  color = {15, 180, 90};
+  // add second ball
+  balls.push_back(Ball {position, velocity, color});
+  
   // Player 1 paddle
   mP1_PaddlePos.x = 10.0f;
   mP1_PaddlePos.y = 384.0f;
@@ -27,6 +37,8 @@ float Game::GetElapsedTime() {
   Uint32 currTime = SDL_GetTicks();
   float delta = (currTime - mCurrentTicks) / 1000.0f;
   mCurrentTicks = currTime;   // store current time for next watchstop action in future
+  if (delta > 0.5)
+    delta = 0.5f;
   return delta;
 }
 
@@ -55,16 +67,20 @@ void Game::GenerateOutput() {
   // draw the bottom wall
   SDL_RenderFillRect(mRenderer, &wall);
 
-  // the ball
-  SDL_Rect ball {
-    static_cast<int>(mBallPos.x - (ball_width/2)),
-    static_cast<int>(mBallPos.y - (ball_height/2)),
-    ball_width,
-    ball_height
-  };
-  SDL_RenderFillRect(mRenderer, &ball);
+  // all balls
+  SDL_Rect ball_shape;
+  ball_shape.w = ball_width;
+  ball_shape.h = ball_height;
+
+  for (auto it = balls.begin(); it != balls.end(); it++) {
+    ball_shape.x = static_cast<int>(it->position.x - (ball_width / 2));
+    ball_shape.y = static_cast<int>(it->position.y - (ball_height / 2));
+    SDL_SetRenderDrawColor(mRenderer, it->color.r, it->color.g, it->color.b, it->color.a);
+    SDL_RenderFillRect(mRenderer, &ball_shape);
+  }
   
   // the paddle's
+  SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);  // restore to normal color for the field elements
   SDL_Rect paddle {
     static_cast<int>(mP1_PaddlePos.x - (paddle_width/2)),
     static_cast<int>(mP1_PaddlePos.y - (paddle_height/2)),
@@ -162,42 +178,45 @@ void Game::UpdateGame(float deltaTime) {
       mP2_PaddlePos.y = 768 - thickness - (paddle_height / 2.0f);
   }
     
-  // update the ball
-  mBallPos.x += mBallVelocity.x * deltaTime;
-  mBallPos.y += mBallVelocity.y * deltaTime;
-  // check for collisions with the walls
-  if((mBallPos.y - ball_height/2.0f <= 0 + thickness) &&
-      mBallVelocity.y < 0.0f)    // with top wall only when moving upwards
-    mBallVelocity.y = -1 * mBallVelocity.y;
-  if((mBallPos.y + ball_height / 2.0f >= 768 - thickness) &&
-      mBallVelocity.y > 0.0f)    // with bottom wall when moving downwards
-    mBallVelocity.y = -1 * mBallVelocity.y;
-  /*
-  if(mBallPos.x >= (1024 - ball_width/2.0f))
-    mBallVelocity.x = -1 * mBallVelocity.x;
-  */
+  // update the ball(s)
+  for (auto it = balls.begin(); it != balls.end(); it++) {
+    it->position.x += it->velocity.x * deltaTime;
+    it->position.y += it->velocity.y * deltaTime;
+    // check for collisions with the upper/bottom walls
+    if ((it->position.y - ball_height / 2.0f <= 0 + thickness) &&
+        it->velocity.y < 0.0f)    // with top wall only when moving upwards
+        it->velocity.y = -1 * it->velocity.y;
+    if ((it->position.y + ball_height / 2.0f >= 768 - thickness) &&
+        it->position.y > 0.0f)    // with bottom wall when moving downwards
+        it->velocity.y = -1 * it->velocity.y;
+    // collision with the player1 paddle?
+    if ((std::abs(mP1_PaddlePos.y - it->position.y) < (paddle_height / 2.0f + ball_height / 2.0f)) &&
+        (it->position.x <= mP1_PaddlePos.x + thickness / 2.0f) &&
+        (it->velocity.x < 0)
+       )
+      it->velocity.x = -1 * it->velocity.x;
+    // collision with the player2 paddle?
+    if ((std::abs(mP2_PaddlePos.y - it->position.y) < (paddle_height / 2.0f + ball_height / 2.0f)) &&
+        (it->position.x >= mP2_PaddlePos.x - thickness / 2.0f) &&
+        (it->position.x > 0)
+       )
+      it->velocity.x = -1 * it->velocity.x;
+    // is ball beyond paddles?
+    if (it->position.x < 0 || it->position.x > 1024) {
+      // remove only additional balls from the playfield
+      /*
+      if(balls.size() > 1)
+        it = balls.erase(it);
+      
+      else {  */ // last ball will only be reset to center
+        it->position.x = 500;
+        it->position.y = 370;
+      /* } */
+      
+    }
 
-  // collision with the player1 paddle?
-  if(
-     (std::abs(mP1_PaddlePos.y - mBallPos.y) < (paddle_height/2.0f + ball_height/2.0f)) &&
-     (mBallPos.x <= mP1_PaddlePos.x + thickness/2.0f) &&
-     (mBallVelocity.x < 0)
-    )
-    mBallVelocity.x = -1 * mBallVelocity.x;
-  // collision with the player2 paddle?
-  if (
-      (std::abs(mP2_PaddlePos.y - mBallPos.y) < (paddle_height / 2.0f + ball_height / 2.0f)) &&
-      (mBallPos.x >= mP2_PaddlePos.x - thickness / 2.0f) &&
-      (mBallVelocity.x > 0)
-     )
-    mBallVelocity.x = -1 * mBallVelocity.x;
-
-  // is ball beyond paddle?
-  if (mBallPos.x < 0 || mBallPos.x > 1024) {
-    mBallPos = { 512.0f, 384.0f };
-    mBallVelocity = { -200.0f, 235.0f };
+    // and should we handle ball to ball-collision separatedly?
   }
-    
 }
 
 void Game::RunLoop() {

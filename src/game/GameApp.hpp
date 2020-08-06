@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SDL.h"
+#include <vector>
 
 const int thickness = 15;
 const int ball_width = 15;
@@ -11,6 +12,12 @@ const int paddle_width = 15;
 struct Vector2 {
   float x;
   float y;
+};
+
+struct Ball {
+  Vector2 position;
+  Vector2 velocity;
+  SDL_Color color;
 };
 
 class Game {
@@ -24,9 +31,7 @@ class Game {
     Vector2 mP2_PaddlePos;
     int mP2_PaddleDir;
 
-    Vector2 mBallPos;
-    Vector2 mBallVelocity;
-    
+    std::vector<Ball> balls;    /* should we specify the expected size = number of balls? (e.g. max. 3) */
     float GetElapsedTime();
   private:
     // game loop helper functions
