@@ -1,244 +1,304 @@
-#include <cmath>
+// ----------------------------------------------------------------
+// From Game Programming in C++ by Sanjay Madhav
+// Copyright (C) 2017 Sanjay Madhav. All rights reserved.
+// 
+// Released under the BSD License
+// See LICENSE in root directory for full details.
+// ----------------------------------------------------------------
+
 #include "GameApp.hpp"
 
-Game::Game() {
-  mIsRunning = true;
-  mWindow = nullptr;
-  mRenderer = nullptr;
-  Vector2 position = {512.0f, 384.0f};
-  Vector2 velocity = { -70.0f, 60.0f };
-  SDL_Color color { 200, 55, 20, 255 };
-  // add first ball
-  balls.push_back(Ball {position, velocity, color});
-  
-  position = { 512.0f, 384.0f };
-  velocity = { 70.0f, 60.0f };
-  color = {15, 180, 90};
-  // add second ball
-  balls.push_back(Ball {position, velocity, color});
-  
-  // Player 1 paddle
-  mP1_PaddlePos.x = 10.0f;
-  mP1_PaddlePos.y = 384.0f;
-  mP1_PaddleDir = 0;
-  // Player 2 paddle
-  mP2_PaddlePos.x = 1010.0f;
-  mP2_PaddlePos.y = 384.0f;
-  mP2_PaddleDir = 0;
+const int thickness = 15;
+const float paddleH = 100.0f;
 
-  mCurrentTicks = SDL_GetTicks();
+Game::Game()
+	:mWindow(nullptr)
+	, mRenderer(nullptr)
+	, mTicksCount(0)
+	, mIsRunning(true)
+	, mPaddle1Dir(0)
+	, mPaddle2Dir{0}
+{
+
 }
 
-/// <summary>
-/// calculates elapsed time since last call of this function
-/// </summary>
-/// <returns>time in seconds</returns>
-float Game::GetElapsedTime() {
-  Uint32 currTime = SDL_GetTicks();
-  float delta = (currTime - mCurrentTicks) / 1000.0f;
-  mCurrentTicks = currTime;   // store current time for next watchstop action in future
-  if (delta > 0.5)
-    delta = 0.5f;
-  return delta;
+bool Game::Initialize()
+{
+	// Initialize SDL
+	int sdlResult = SDL_Init(SDL_INIT_VIDEO);
+	if (sdlResult != 0)
+	{
+		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+		return false;
+	}
+
+	// Create an SDL Window
+	mWindow = SDL_CreateWindow(
+		"Game Programming in C++ (Chapter 1)", // Window title
+		100,	// Top left x-coordinate of window
+		100,	// Top left y-coordinate of window
+		1024,	// Width of window
+		768,	// Height of window
+		0		// Flags (0 for no flags set)
+	);
+
+	if (!mWindow)
+	{
+		SDL_Log("Failed to create window: %s", SDL_GetError());
+		return false;
+	}
+
+	//// Create SDL renderer
+	mRenderer = SDL_CreateRenderer(
+		mWindow, // Window to create renderer for
+		-1,		 // Usually -1
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+	);
+
+	if (!mRenderer)
+	{
+		SDL_Log("Failed to create renderer: %s", SDL_GetError());
+		return false;
+	}
+	//
+	mPaddle1Pos.x = 10.0f;
+	mPaddle1Pos.y = 768.0f / 2.0f;
+	mPaddle2Pos.x = 1000.0f;
+	mPaddle2Pos.y = 768.0f / 2.0f;
+	mBallPos.x = 1024.0f / 2.0f;
+	mBallPos.y = 768.0f / 2.0f;
+	mBallVel.x = -200.0f;
+	mBallVel.y = 235.0f;
+	return true;
 }
 
-void Game::GenerateOutput() {
-  // first set bckground color
-  SDL_SetRenderDrawColor(mRenderer,
-    0,  /* red */
-    0,  /* green */
-    255, /* blue */
-    255 /* alpha */
-  );
-  SDL_RenderClear(mRenderer);
-
-  SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
-  SDL_Rect wall{
-    0,    // top left x
-    0,    // top left y
-    1024, // width
-    thickness  // height
-  };
-  // draw the top wall
-  SDL_RenderFillRect(mRenderer, &wall);
-
-  // define bottom wall
-  wall.x = 0; wall.y = 768 - thickness; wall.w = 1024; wall.h = thickness;
-  // draw the bottom wall
-  SDL_RenderFillRect(mRenderer, &wall);
-
-  // all balls
-  SDL_Rect ball_shape;
-  ball_shape.w = ball_width;
-  ball_shape.h = ball_height;
-
-  for (auto it = balls.begin(); it != balls.end(); it++) {
-    ball_shape.x = static_cast<int>(it->position.x - (ball_width / 2));
-    ball_shape.y = static_cast<int>(it->position.y - (ball_height / 2));
-    SDL_SetRenderDrawColor(mRenderer, it->color.r, it->color.g, it->color.b, it->color.a);
-    SDL_RenderFillRect(mRenderer, &ball_shape);
-  }
-  
-  // the paddle's
-  SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);  // restore to normal color for the field elements
-  SDL_Rect paddle {
-    static_cast<int>(mP1_PaddlePos.x - (paddle_width/2)),
-    static_cast<int>(mP1_PaddlePos.y - (paddle_height/2)),
-    paddle_width,
-    paddle_height
-  };
-  SDL_RenderFillRect(mRenderer, &paddle);
-
-  paddle.x = static_cast<int>(mP2_PaddlePos.x - (paddle_width / 2));
-  paddle.y = static_cast<int>(mP2_PaddlePos.y - (paddle_width / 2));
-  SDL_RenderFillRect(mRenderer, &paddle);
-
-  // time to show the resulting image
-  SDL_RenderPresent(mRenderer);
+void Game::RunLoop()
+{
+	while (mIsRunning)
+	{
+		ProcessInput();
+		UpdateGame();
+		GenerateOutput();
+	}
 }
 
+void Game::ProcessInput()
+{
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
+	{
+		switch (event.type)
+		{
+			// If we get an SDL_QUIT event, end loop
+		case SDL_QUIT:
+			mIsRunning = false;
+			break;
+		}
+	}
 
-void Game::ProcessInput() {
-  SDL_Event event;
+	// Get state of keyboard
+	const Uint8* state = SDL_GetKeyboardState(NULL);
+	// If escape is pressed, also end loop
+	if (state[SDL_SCANCODE_ESCAPE])
+	{
+		mIsRunning = false;
+	}
 
-  const Uint8* keyb_state = SDL_GetKeyboardState(NULL);
-  // if ESC-key is pressed, then signal game loop to stop running
-  if(keyb_state[SDL_SCANCODE_ESCAPE])
-    mIsRunning = false;
-  // check for paddle player1 movement
-  mP1_PaddleDir = 0;
-  if(keyb_state[SDL_SCANCODE_W])
-    mP1_PaddleDir = -1;
-  if (keyb_state[SDL_SCANCODE_S])
-    mP1_PaddleDir = 1;
-  // check for paddle player2 movement
-  mP2_PaddleDir = 0;
-  if (keyb_state[SDL_SCANCODE_I])
-    mP2_PaddleDir = -1;
-  if (keyb_state[SDL_SCANCODE_K])
-    mP2_PaddleDir = 1;
-
-  // while there are still events in the queue
-  while (SDL_PollEvent(&event)) {
-    switch (event.type) {
-      case SDL_QUIT:
-        mIsRunning = false;
-        break;
-    }
-  }
+	// Update paddle direction based on W/S keys respective I/K
+	mPaddle1Dir = 0;
+	if (state[SDL_SCANCODE_W])
+	{
+		mPaddle1Dir -= 1;
+	}
+	if (state[SDL_SCANCODE_S])
+	{
+		mPaddle1Dir += 1;
+	}
+	mPaddle2Dir = 0;
+	if (state[SDL_SCANCODE_I])
+	{
+		mPaddle2Dir -= 1;
+	}
+	if (state[SDL_SCANCODE_K])
+	{
+		mPaddle2Dir += 1;
+	}
 }
 
-bool Game::Initialize() {
-  
-  int sdlResult = SDL_Init(SDL_INIT_VIDEO);
-  if (sdlResult != 0) {
-    SDL_Log("Unable to init SDL! Errorcode:%s", SDL_GetError());
-    return false;
-  }
+void Game::UpdateGame()
+{
+	// Wait until 16ms has elapsed since last frame
+	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))
+		;
 
-  mWindow = SDL_CreateWindow(
-    "Game Programming in C++ (Ch1)",    // title
-    100,                                // top left x-coord of window
-    100,                                // top left y-coord of window
-    1024,                               // width of window
-    768,                                // height of window
-    0                                   // flags set
-  );
-  if (!mWindow) {
-    SDL_Log("Unable to create main window! Errorcode:%s", SDL_GetError());
-    return false;
-  }
-  
-  mRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-  if (!mRenderer) {
-    SDL_Log("Unable to create Renderer! Errorcode:%s", SDL_GetError());
-    return false;
-  }
+	// Delta time is the difference in ticks from last frame
+	// (converted to seconds)
+	float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
 
-  // if we reach here, everything seems fine
-  return true;
+	// Clamp maximum delta time value
+	if (deltaTime > 0.05f)
+	{
+		deltaTime = 0.05f;
+	}
+
+	// Update tick counts (for next frame)
+	mTicksCount = SDL_GetTicks();
+
+	// Update paddle position based on direction
+	if (mPaddle1Dir != 0)
+	{
+		mPaddle1Pos.y += mPaddle1Dir * 300.0f * deltaTime;
+		// Make sure paddle doesn't move off screen!
+		if (mPaddle1Pos.y < (paddleH / 2.0f + thickness))
+		{
+			mPaddle1Pos.y = paddleH / 2.0f + thickness;
+		}
+		else if (mPaddle1Pos.y > (768.0f - paddleH / 2.0f - thickness))
+		{
+			mPaddle1Pos.y = 768.0f - paddleH / 2.0f - thickness;
+		}
+	}
+	if (mPaddle2Dir != 0)
+	{
+		mPaddle2Pos.y += mPaddle2Dir * 300.0f * deltaTime;
+		// Make sure paddle doesn't move off screen!
+		if (mPaddle2Pos.y < (paddleH / 2.0f + thickness))
+		{
+			mPaddle2Pos.y = paddleH / 2.0f + thickness;
+		}
+		else if (mPaddle2Pos.y > (768.0f - paddleH / 2.0f - thickness))
+		{
+			mPaddle2Pos.y = 768.0f - paddleH / 2.0f - thickness;
+		}
+	}
+
+	// Update ball position based on ball velocity
+	mBallPos.x += mBallVel.x * deltaTime;
+	mBallPos.y += mBallVel.y * deltaTime;
+
+	// Bounce if needed
+	// 
+	// Did we intersect with the paddle player1?
+	float diff = mPaddle1Pos.y - mBallPos.y;
+	// Take absolute value of difference
+	diff = (diff > 0.0f) ? diff : -diff;
+	if (
+		// Our y-difference is small enough
+		diff <= paddleH / 2.0f &&
+		// We are in the correct x-position
+		mBallPos.x <= 25.0f && mBallPos.x >= 20.0f &&
+		// The ball is moving to the left
+		mBallVel.x < 0.0f)
+	{
+		mBallVel.x *= -1.0f;
+	}
+
+	// Did we intersect with the paddle player2?
+	diff = mPaddle2Pos.y - mBallPos.y;
+	// Take absolute value of difference
+	diff = (diff > 0.0f) ? diff : -diff;
+	if (
+		// Our y-difference is small enough
+		diff <= paddleH / 2.0f &&
+		// We are in the correct x-position
+		mBallPos.x >= 1000.0f && mBallPos.x <= 1020.0f &&
+		// The ball is moving to the right
+		mBallVel.x > 0.0f)
+	{
+		mBallVel.x *= -1.0f;
+	}
+
+
+	// Did the ball go off the screen? (if so, end game)
+	else if (mBallPos.x <= 0.0f + (thickness / 2))
+	{
+		mBallVel.x = 0.0f;
+		mBallVel.y = 0.0f;
+	}
+	// Did the ball collide with the right wall?
+	else if (mBallPos.x >= (1024.0f - (thickness / 2)) && mBallVel.x > 0.0f)
+	{
+		mBallVel.x = 0.0f;
+		mBallVel.y = 0.0f;
+	}
+
+	// Did the ball collide with the top wall?
+	if (mBallPos.y <= thickness && mBallVel.y < 0.0f)
+	{
+		mBallVel.y *= -1;
+	}
+	// Did the ball collide with the bottom wall?
+	else if (mBallPos.y >= (768 - thickness) &&
+		mBallVel.y > 0.0f)
+	{
+		mBallVel.y *= -1;
+	}
 }
 
-void Game::UpdateGame(float deltaTime) {
-  // update the Player1 (left side) paddle position
-  if (mP1_PaddleDir != 0) {
-    mP1_PaddlePos.y += mP1_PaddleDir * 300.0f * deltaTime;
-    if(mP1_PaddlePos.y < (0 + thickness + paddle_height/2.0f))
-      mP1_PaddlePos.y = thickness + (paddle_height / 2.0f);
-    else if(mP1_PaddlePos.y > (768 - thickness - (paddle_height / 2.0f)))
-      mP1_PaddlePos.y = 768 - thickness - (paddle_height / 2.0f);
-  }
+void Game::GenerateOutput()
+{
+	// Set draw color to blue
+	SDL_SetRenderDrawColor(
+		mRenderer,
+		0,		// R
+		0,		// G 
+		255,	// B
+		255		// A
+	);
 
-  // update the Player2 (right side) paddle position
-  if (mP2_PaddleDir != 0) {
-    mP2_PaddlePos.y += mP2_PaddleDir * 300.0f * deltaTime;
-    if (mP2_PaddlePos.y < (0 + thickness + paddle_height / 2.0f))
-      mP2_PaddlePos.y = thickness + (paddle_height / 2.0f);
-    else if (mP2_PaddlePos.y > (768 - thickness - (paddle_height / 2.0f)))
-      mP2_PaddlePos.y = 768 - thickness - (paddle_height / 2.0f);
-  }
-    
-  // update the ball(s)
-  for (auto it = balls.begin(); it != balls.end(); it++) {
-    it->position.x += it->velocity.x * deltaTime;
-    it->position.y += it->velocity.y * deltaTime;
-    // check for collisions with the upper/bottom walls
-    if ((it->position.y - ball_height / 2.0f <= 0 + thickness) &&
-        it->velocity.y < 0.0f)    // with top wall only when moving upwards
-        it->velocity.y = -1 * it->velocity.y;
-    if ((it->position.y + ball_height / 2.0f >= 768 - thickness) &&
-        it->position.y > 0.0f)    // with bottom wall when moving downwards
-        it->velocity.y = -1 * it->velocity.y;
-    // collision with the player1 paddle?
-    if ((std::abs(mP1_PaddlePos.y - it->position.y) < (paddle_height / 2.0f + ball_height / 2.0f)) &&
-        (it->position.x <= mP1_PaddlePos.x + thickness / 2.0f) &&
-        (it->velocity.x < 0)
-       )
-      it->velocity.x = -1 * it->velocity.x;
-    // collision with the player2 paddle?
-    if ((std::abs(mP2_PaddlePos.y - it->position.y) < (paddle_height / 2.0f + ball_height / 2.0f)) &&
-        (it->position.x >= mP2_PaddlePos.x - thickness / 2.0f) &&
-        (it->position.x > 0)
-       )
-      it->velocity.x = -1 * it->velocity.x;
-    // is ball beyond paddles?
-    if (it->position.x < 0 || it->position.x > 1024) {
-      // remove only additional balls from the playfield
-      /*
-      if(balls.size() > 1)
-        it = balls.erase(it);
-      
-      else {  */ // last ball will only be reset to center
-        it->position.x = 500;
-        it->position.y = 370;
-      /* } */
-      
-    }
+	// Clear back buffer
+	SDL_RenderClear(mRenderer);
 
-    // and should we handle ball to ball-collision separatedly?
-  }
+	// Draw walls
+	SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
+
+	// Draw top wall
+	SDL_Rect wall{
+		0,			// Top left x
+		0,			// Top left y
+		1024,		// Width
+		thickness	// Height
+	};
+	SDL_RenderFillRect(mRenderer, &wall);
+
+	// Draw bottom wall
+	wall.y = 768 - thickness;
+	SDL_RenderFillRect(mRenderer, &wall);
+	
+	// Draw paddle player1
+	SDL_Rect paddle1 {
+		static_cast<int>(mPaddle1Pos.x),
+		static_cast<int>(mPaddle1Pos.y - paddleH / 2),
+		thickness,
+		static_cast<int>(paddleH)
+	};
+	SDL_RenderFillRect(mRenderer, &paddle1);
+
+	// Draw paddle player2
+	SDL_Rect paddle2 {
+		static_cast<int>(mPaddle2Pos.x),
+		static_cast<int>(mPaddle2Pos.y - paddleH / 2),
+		thickness,
+		static_cast<int>(paddleH)
+	};
+	SDL_RenderFillRect(mRenderer, &paddle2);
+
+	// Draw ball
+	SDL_Rect ball{
+		static_cast<int>(mBallPos.x - thickness / 2),
+		static_cast<int>(mBallPos.y - thickness / 2),
+		thickness,
+		thickness
+	};
+	SDL_RenderFillRect(mRenderer, &ball);
+
+	// Swap front buffer and back buffer
+	SDL_RenderPresent(mRenderer);
 }
 
-void Game::RunLoop() {
-  float deltaTime;
-  int waitTime;
-
-  while (mIsRunning) {
-    deltaTime = GetElapsedTime();
-    // ensure frame rate cap by waiting
-    waitTime = 16 - int(deltaTime * 1000.0f + 0.5f);
-    if (waitTime > 0) {
-      SDL_Delay(std::abs(waitTime));
-      deltaTime = deltaTime + waitTime;
-    }
-    ProcessInput();
-    UpdateGame(deltaTime);
-    GenerateOutput();
-  }
-}
-
-void Game::Shutdown() {
-  SDL_DestroyRenderer(mRenderer);
-  SDL_DestroyWindow(mWindow);
-  SDL_Quit();
+void Game::Shutdown()
+{
+	SDL_DestroyRenderer(mRenderer);
+	SDL_DestroyWindow(mWindow);
+	SDL_Quit();
 }

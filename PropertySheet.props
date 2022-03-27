@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <SDL2_INCLUDE>C:\Libs\SDL2\include</SDL2_INCLUDE>
+    <SDL2_INCLUDE>D:\Libs\SDL2\include</SDL2_INCLUDE>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />

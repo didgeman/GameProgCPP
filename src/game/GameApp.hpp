@@ -1,48 +1,57 @@
+// ----------------------------------------------------------------
+// From Game Programming in C++ by Sanjay Madhav
+// Copyright (C) 2017 Sanjay Madhav. All rights reserved.
+// 
+// Released under the BSD License
+// See LICENSE in root directory for full details.
+// ----------------------------------------------------------------
+
 #pragma once
-
 #include "SDL.h"
-#include <vector>
 
-const int thickness = 15;
-const int ball_width = 15;
-const int ball_height = 15;
-const int paddle_height = 45;
-const int paddle_width = 15;
-
-struct Vector2 {
-  float x;
-  float y;
+// Vector2 struct just stores x/y coordinates
+// (for now)
+struct Vector2
+{
+	float x;
+	float y;
 };
 
-struct Ball {
-  Vector2 position;
-  Vector2 velocity;
-  SDL_Color color;
-};
+// Game class
+class Game
+{
+public:
+	Game();
+	// Initialize the game
+	bool Initialize();
+	// Runs the game loop until the game is over
+	void RunLoop();
+	// Shutdown the game
+	void Shutdown();
+private:
+	// Helper functions for the game loop
+	void ProcessInput();
+	void UpdateGame();
+	void GenerateOutput();
 
-class Game {
-  public:
-    Game();
-    bool Initialize();
-    void RunLoop();
-    void Shutdown();
-    Vector2 mP1_PaddlePos;
-    int mP1_PaddleDir;
-    Vector2 mP2_PaddlePos;
-    int mP2_PaddleDir;
+	// Window created by SDL
+	SDL_Window* mWindow;
+	// Renderer for 2D drawing
+	SDL_Renderer* mRenderer;
+	// Number of ticks since start of game
+	Uint32 mTicksCount;
+	// Game should continue to run
+	bool mIsRunning;
 
-    std::vector<Ball> balls;    /* should we specify the expected size = number of balls? (e.g. max. 3) */
-    float GetElapsedTime();
-  private:
-    // game loop helper functions
-    void ProcessInput();
-    void UpdateGame(float deltaTime);    // apply evolve rules to the world
-    void GenerateOutput();
-
-    Uint32 mCurrentTicks;
-
-    SDL_Window* mWindow;   // reference to our main SDL-window
-    bool mIsRunning;       // controls lifetime of our App
-    SDL_Renderer* mRenderer;   // reference to SDL's render system
-
+	// Pong specific
+	// Direction of paddles
+	int mPaddle1Dir;
+	int mPaddle2Dir;
+	// Position of paddle
+	Vector2 mPaddle1Pos;
+	Vector2 mPaddle2Pos;
+	// Position of ball
+	Vector2 mBallPos;
+	// Velocity of ball
+	Vector2 mBallVel;
 };
