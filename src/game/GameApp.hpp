@@ -9,6 +9,8 @@
 #pragma once
 #include "SDL.h"
 
+const int BALL_COUNT = 2;
+
 // Vector2 struct just stores x/y coordinates
 // (for now)
 struct Vector2
@@ -50,8 +52,8 @@ private:
 	// Position of paddle
 	Vector2 mPaddle1Pos;
 	Vector2 mPaddle2Pos;
-	// Position of ball
-	Vector2 mBallPos;
+	// Position of balls
+	Vector2 mBallPos[2];
 	// Velocity of ball
-	Vector2 mBallVel;
+	Vector2 mBallVel[BALL_COUNT];
 };
