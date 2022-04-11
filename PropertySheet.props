@@ -3,6 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <SDL2_INCLUDE>D:\Libs\SDL2\include</SDL2_INCLUDE>
+    <IMGUI_DIR>D:\Libs\imgui</IMGUI_DIR>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -10,6 +11,9 @@
     <BuildMacro Include="SDL2_INCLUDE">
       <Value>$(SDL2_INCLUDE)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="IMGUI_DIR">
+      <Value>$(IMGUI_DIR)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>
