@@ -51,6 +51,21 @@
     <ClCompile Include="..\..\..\..\..\Libs\imgui\backends\imgui_impl_sdl.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="src\SpaceDefender\MadMath.cpp">
+      <Filter>Source Files\SpaceDefender</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpaceDefender\SpriteComponent.cpp">
+      <Filter>Source Files\SpaceDefender</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpaceDefender\Component.cpp">
+      <Filter>Source Files\SpaceDefender</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpaceDefender\Actor.cpp">
+      <Filter>Source Files\SpaceDefender</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpaceDefender\BGSpriteComponent.cpp">
+      <Filter>Source Files\SpaceDefender</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SpaceDefenderApp.hpp">
@@ -70,6 +85,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\Libs\imgui\backends\imgui_impl_sdlrenderer.h">
       <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MadMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SpriteComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BGSpriteComponent.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

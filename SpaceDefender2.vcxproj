@@ -96,12 +96,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(IMGUI_DIR)\backends;$(IMGUI_DIR);$(ProjectDir)include;$(SDL2_INCLUDE)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL_IMAGE_INCLUDE);$(IMGUI_DIR)\backends;$(IMGUI_DIR);$(ProjectDir)include;$(SDL2_INCLUDE)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Libs\SDL2\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Libs\SDL2_image\VisualC\$(Platform)\$(Configuration);D:\Libs\SDL2\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:msvcrt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -114,14 +114,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(IMGUI_DIR)\backends;$(IMGUI_DIR);$(ProjectDir)include;$(SDL2_INCLUDE)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL_IMAGE_INCLUDE);$(IMGUI_DIR)\backends;$(IMGUI_DIR);$(ProjectDir)include;$(SDL2_INCLUDE)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Libs\SDL2\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Libs\SDL2_image\VisualC\$(Platform)\$(Configuration);D:\Libs\SDL2\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -131,13 +131,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(IMGUI_DIR)\backends;$(IMGUI_DIR);$(ProjectDir)include;$(SDL2_INCLUDE)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL_IMAGE_INCLUDE);$(IMGUI_DIR)\backends;$(IMGUI_DIR);$(ProjectDir)include;$(SDL2_INCLUDE)</AdditionalIncludeDirectories>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Libs\SDL2\VisualC\$(Platform)\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Libs\SDL2_image\VisualC\$(Platform)\$(Configuration);D:\Libs\SDL2\VisualC\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2_image.lib;SDL2.lib;SDL2main.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:msvcrt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -149,14 +150,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(IMGUI_DIR)\backends;$(IMGUI_DIR);$(ProjectDir)include;$(SDL2_INCLUDE)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL_IMAGE_INCLUDE);$(IMGUI_DIR)\backends;$(IMGUI_DIR);$(ProjectDir)include;$(SDL2_INCLUDE)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Libs\SDL2\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Libs\SDL2_image\VisualC\$(Platform)\$(Configuration);D:\Libs\SDL2\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,8 +168,13 @@
     <ClCompile Include="..\..\..\..\..\Libs\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\..\..\Libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\..\..\Libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\SpaceDefender\Actor.cpp" />
+    <ClCompile Include="src\SpaceDefender\BGSpriteComponent.cpp" />
+    <ClCompile Include="src\SpaceDefender\Component.cpp" />
     <ClCompile Include="src\SpaceDefender\main.cpp" />
+    <ClCompile Include="src\SpaceDefender\MadMath.cpp" />
     <ClCompile Include="src\SpaceDefender\SpaceDefenderApp.cpp" />
+    <ClCompile Include="src\SpaceDefender\SpriteComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\Libs\imgui\backends\imgui_impl_sdl.h" />
@@ -176,7 +182,12 @@
     <ClInclude Include="..\..\..\..\..\Libs\imgui\imconfig.h" />
     <ClInclude Include="..\..\..\..\..\Libs\imgui\imgui.h" />
     <ClInclude Include="..\..\..\..\..\Libs\imgui\imgui_internal.h" />
+    <ClInclude Include="include\Actor.h" />
+    <ClInclude Include="include\BGSpriteComponent.h" />
+    <ClInclude Include="include\Component.h" />
+    <ClInclude Include="include\MadMath.h" />
     <ClInclude Include="include\SpaceDefenderApp.hpp" />
+    <ClInclude Include="include\SpriteComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

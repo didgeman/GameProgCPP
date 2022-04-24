@@ -4,6 +4,7 @@
   <PropertyGroup Label="UserMacros">
     <SDL2_INCLUDE>D:\Libs\SDL2\include</SDL2_INCLUDE>
     <IMGUI_DIR>D:\Libs\imgui</IMGUI_DIR>
+    <SDL_IMAGE_INCLUDE>D:\Libs\SDL2_image</SDL_IMAGE_INCLUDE>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -14,6 +15,9 @@
     </BuildMacro>
     <BuildMacro Include="IMGUI_DIR">
       <Value>$(IMGUI_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SDL_IMAGE_INCLUDE">
+      <Value>$(SDL_IMAGE_INCLUDE)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

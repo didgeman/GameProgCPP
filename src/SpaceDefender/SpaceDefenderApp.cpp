@@ -7,9 +7,13 @@
 // ----------------------------------------------------------------
 
 #include "imgui.h"
+#include "SDL_image.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_sdlrenderer.h"
 #include "SpaceDefenderApp.hpp"
+#include "Actor.h"
+#include "SpriteComponent.h"
+#include "BGSpriteComponent.h"
 
 
 Game::Game()
@@ -17,13 +21,14 @@ Game::Game()
 	, mRenderer(nullptr)
 	, mTicksCount(0)
 	, mIsRunning(true)
+	, mUpdatingActors(false)
 {
 	
 }
 
 bool Game::Initialize()
 {
-	// Initialize SDL
+	//----------- Initialize SDL  ------------------------
 	int sdlResult = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER);
 	if (sdlResult != 0)
 	{
@@ -60,9 +65,31 @@ bool Game::Initialize()
 		return false;
 	}
 
+	// Create actor for the background (this doesn't need a subclass)
+	Actor* temp = new Actor(this);
+	temp->SetPosition(Vector2(512.0f, 384.0f));
+	// Create the "far back" background
+	BGSpriteComponent* bg = new BGSpriteComponent(temp);
+	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
+	std::vector<SDL_Texture*> bgtexs = {
+		GetTexture("Assets/Farback01.png"),
+		GetTexture("Assets/Farback02.png")
+	};
+	bg->SetBGTextures(bgtexs);
+	bg->SetScrollSpeed(-100.0f);
+	// Create the closer background
+	bg = new BGSpriteComponent(temp, 50);
+	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
+	bgtexs = {
+		GetTexture("Assets/Stars.png"),
+		GetTexture("Assets/Stars.png")
+	};
+	bg->SetBGTextures(bgtexs);
+	bg->SetScrollSpeed(-200.0f);
+
+	//-----------  Init IMGUI  -----------------
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	
 
 	// Setup the Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -70,6 +97,9 @@ bool Game::Initialize()
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForSDLRenderer(mWindow, mRenderer);
 	ImGui_ImplSDLRenderer_Init(mRenderer);
+		
+	//-----------  init SDL-Image library  ---------
+	IMG_Init(IMG_INIT_PNG);
 
 	return true;
 }
@@ -127,6 +157,36 @@ void Game::UpdateGame()
 
 	// Update tick counts (for next frame)
 	mTicksCount = SDL_GetTicks();
+
+	// update all actors
+	mUpdatingActors = true;
+	for (auto actor : mActors)
+	{
+		actor->Update(deltaTime);
+	}
+	mUpdatingActors = false;
+
+	// move any pending actors to the actors-List
+	for (auto pending : mPendingActors)
+	{
+		mActors.emplace_back(pending);
+	}
+	mPendingActors.clear();
+
+	// Add any dead actors to a temp vector
+	std::vector<Actor*> deadActors;
+	for (auto actor:mActors)
+	{
+		if (actor->GetState() == Actor::EDead)
+			deadActors.emplace_back(actor);
+	}
+
+	// Delete dead actors which automatically (how?) removes them also from mActors
+	for (auto actor : deadActors)
+	{
+		delete actor;
+	}
+
 }
 
 void Game::GenerateOutput()
@@ -148,6 +208,13 @@ void Game::GenerateOutput()
 
 	// Clear back buffer
 	SDL_RenderClear(mRenderer);
+	SDL_SetRenderDrawColor(mRenderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
+	
+	// Draw all sprite components
+	for (auto sprite : mSprites)
+	{
+		sprite->Draw(mRenderer);
+	}
 
 	// Start the Dear ImGui frame
 	ImGui_ImplSDLRenderer_NewFrame();
@@ -191,8 +258,6 @@ void Game::GenerateOutput()
 	}
 
 	ImGui::Render();
-	SDL_SetRenderDrawColor(mRenderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-	SDL_RenderClear(mRenderer);
 	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 
 	// Swap front buffer and back buffer
@@ -201,12 +266,115 @@ void Game::GenerateOutput()
 
 void Game::Shutdown()
 {
-	// Cleanup
+	// unload game data (actors...)
+	while (!mActors.empty())
+	{
+		delete mActors.back();
+	}
+	// and their textures
+	for (auto i : mTextures)
+	{
+		SDL_DestroyTexture(i.second);
+	}
+	mTextures.clear();
+
+	//--------  SDL-Image library cleanup ----------
+	IMG_Quit();
+
+	//-------- Cleanup Imgui resources  ------------
 	ImGui_ImplSDLRenderer_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
+	//-------- Cleanup SDL resources  --------------
 	SDL_DestroyRenderer(mRenderer);
 	SDL_DestroyWindow(mWindow);
 	SDL_Quit();
+}
+
+void Game::AddActor(Actor* anActor)
+{
+	// if in updating process add to pending actors
+	if (mUpdatingActors) {
+		mPendingActors.emplace_back(anActor);
+	}
+	else {
+		mActors.emplace_back(anActor);
+	}
+}
+
+void Game::RemoveActor(Actor* anActor)
+{
+	// Is it in pending actors?
+	auto iter = std::find(mPendingActors.begin(), mPendingActors.end(), anActor);
+	if (iter != mPendingActors.end())
+	{
+		// Swap to end of vector and pop off (avoid erase copies)
+		std::iter_swap(iter, mPendingActors.end() - 1);
+		mPendingActors.pop_back();
+	}
+
+	// Is it in actors?
+	iter = std::find(mActors.begin(), mActors.end(), anActor);
+	if (iter != mActors.end())
+	{
+		// Swap to end of vector and pop off (avoid erase copies)
+		std::iter_swap(iter, mActors.end() - 1);
+		mActors.pop_back();
+	}
+}
+
+void Game::AddSprite(SpriteComponent* aSprite)
+{
+	// find the insertion point in the sorted vector
+	// i.e the first element with a higher draw order than me
+	int myDrawOrder = aSprite->GetDrawOrder();
+	auto iter = mSprites.begin();
+	for (; iter != mSprites.end(); ++iter)
+	{
+		if(myDrawOrder < (*iter)->GetDrawOrder())
+			break;
+	}
+
+	// inserts element before position of iterator
+	mSprites.insert(iter, aSprite);
+}
+
+void Game::RemoveSprite(SpriteComponent* aSprite)
+{
+	// we can't swap because it ruins ordering
+	auto iter = std::find(mSprites.begin(), mSprites.end(), aSprite);
+	mSprites.erase(iter);
+}
+
+SDL_Texture* Game::GetTexture(const std::string& fileName)
+{
+	SDL_Texture* tex = nullptr;
+	// Is the texture already in the map?
+	auto iter = mTextures.find(fileName);		// iter should be of type sthg. "std::pair<std::string, SDL_Texture*>*"
+	if (iter != mTextures.end())
+	{
+		tex = iter->second;
+	}
+	else
+	{
+		// else load texture from file right here
+		SDL_Surface* surf = IMG_Load(fileName.c_str());
+		if (!surf)
+		{
+			SDL_Log("Failed to load texture file %s (Err:%s)", fileName.c_str(), SDL_GetError());
+			return nullptr;
+		}
+		// Create Texture from loaded surface data
+		tex = SDL_CreateTextureFromSurface(mRenderer, surf);
+		SDL_FreeSurface(surf);
+		if (!tex)
+		{
+			SDL_Log("Failed to convert surface to texture for %s (Err: %s)", fileName.c_str(), SDL_GetError());
+			return nullptr;
+		}
+
+		mTextures.emplace(fileName.c_str(), tex);
+	}
+	return tex;
 }

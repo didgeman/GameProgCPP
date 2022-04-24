@@ -8,14 +8,8 @@
 
 #pragma once
 #include "SDL.h"
-
-// Vector2 struct just stores x/y coordinates
-// (for now)
-struct Vector2
-{
-	float x;
-	float y;
-};
+#include <vector>
+#include <unordered_map>
 
 // Game class
 class Game
@@ -28,6 +22,14 @@ public:
 	void RunLoop();
 	// Shutdown the game
 	void Shutdown();
+	// manage the Actor-objects
+	void AddActor(class Actor* anActor);
+	void RemoveActor(class Actor* anActor);
+	// ... and special other game objects
+	void AddSprite(class SpriteComponent* aSprite);
+	void RemoveSprite(class SpriteComponent* aSprite);
+
+	SDL_Texture* GetTexture(const std::string& fileName);
 private:
 	// Helper functions for the game loop
 	void ProcessInput();
@@ -42,4 +44,20 @@ private:
 	Uint32 mTicksCount;
 	// Game should continue to run
 	bool mIsRunning;
+	// flag to show we are in critical status of updating all the actors right now
+	bool mUpdatingActors;
+
+	//---  game data structures  ----
+
+	// Map of textures loaded
+	std::unordered_map<std::string, SDL_Texture*> mTextures;
+	// all the actors in the game
+	std::vector<class Actor*> mActors;
+	// and the pending ones
+	std::vector<class Actor*> mPendingActors;
+	// all the sprite components drawn
+	std::vector<class SpriteComponent*> mSprites;
+
+	// game objects
+	class Ship* mShip;		// player's ship
 };
