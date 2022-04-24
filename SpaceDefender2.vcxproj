@@ -169,10 +169,12 @@
     <ClCompile Include="..\..\..\..\..\Libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\..\..\Libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\SpaceDefender\Actor.cpp" />
+    <ClCompile Include="src\SpaceDefender\AnimSpriteComponent.cpp" />
     <ClCompile Include="src\SpaceDefender\BGSpriteComponent.cpp" />
     <ClCompile Include="src\SpaceDefender\Component.cpp" />
     <ClCompile Include="src\SpaceDefender\main.cpp" />
     <ClCompile Include="src\SpaceDefender\MadMath.cpp" />
+    <ClCompile Include="src\SpaceDefender\Ship.cpp" />
     <ClCompile Include="src\SpaceDefender\SpaceDefenderApp.cpp" />
     <ClCompile Include="src\SpaceDefender\SpriteComponent.cpp" />
   </ItemGroup>
@@ -183,9 +185,11 @@
     <ClInclude Include="..\..\..\..\..\Libs\imgui\imgui.h" />
     <ClInclude Include="..\..\..\..\..\Libs\imgui\imgui_internal.h" />
     <ClInclude Include="include\Actor.h" />
+    <ClInclude Include="include\AnimSpriteComponent.h" />
     <ClInclude Include="include\BGSpriteComponent.h" />
     <ClInclude Include="include\Component.h" />
     <ClInclude Include="include\MadMath.h" />
+    <ClInclude Include="include\Ship.h" />
     <ClInclude Include="include\SpaceDefenderApp.hpp" />
     <ClInclude Include="include\SpriteComponent.h" />
   </ItemGroup>

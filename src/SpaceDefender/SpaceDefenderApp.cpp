@@ -14,6 +14,7 @@
 #include "Actor.h"
 #include "SpriteComponent.h"
 #include "BGSpriteComponent.h"
+#include "Ship.h"
 
 
 Game::Game()
@@ -65,6 +66,11 @@ bool Game::Initialize()
 		return false;
 	}
 
+	// create the Player-Ship
+	mShip = new Ship(this);
+	mShip->SetPosition(Vector2(100.0f, 384.0f));
+	mShip->SetScale(1.5f);
+
 	// Create actor for the background (this doesn't need a subclass)
 	Actor* temp = new Actor(this);
 	temp->SetPosition(Vector2(512.0f, 384.0f));
@@ -76,7 +82,7 @@ bool Game::Initialize()
 		GetTexture("Assets/Farback02.png")
 	};
 	bg->SetBGTextures(bgtexs);
-	bg->SetScrollSpeed(-100.0f);
+	bg->SetScrollSpeed(-80.0f);
 	// Create the closer background
 	bg = new BGSpriteComponent(temp, 50);
 	bg->SetScreenSize(Vector2(1024.0f, 768.0f));
@@ -137,6 +143,8 @@ void Game::ProcessInput()
 		mIsRunning = false;
 	}
 	
+	// process the input for the ship
+	mShip->ProcessKeyboard(state);
 }
 
 void Game::UpdateGame()

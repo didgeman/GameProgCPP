@@ -5,6 +5,7 @@ BGSpriteComponent::BGSpriteComponent(Actor* anOwner, int drawOrder)
     :SpriteComponent(anOwner, drawOrder)
     ,mScrollSpeed(0.0f)
 {
+	
 }
 
 void BGSpriteComponent::Update(float deltaTime)

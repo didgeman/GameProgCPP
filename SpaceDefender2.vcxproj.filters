@@ -66,6 +66,12 @@
     <ClCompile Include="src\SpaceDefender\BGSpriteComponent.cpp">
       <Filter>Source Files\SpaceDefender</Filter>
     </ClCompile>
+    <ClCompile Include="src\SpaceDefender\Ship.cpp">
+      <Filter>Source Files\SpaceDefender</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpaceDefender\AnimSpriteComponent.cpp">
+      <Filter>Source Files\SpaceDefender</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SpaceDefenderApp.hpp">
@@ -99,6 +105,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\BGSpriteComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ship.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimSpriteComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
