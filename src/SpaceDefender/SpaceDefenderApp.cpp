@@ -8,8 +8,8 @@
 
 #include "imgui.h"
 #include "SDL_image.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_sdlrenderer.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_sdlrenderer2.h"
 #include "SpaceDefenderApp.hpp"
 #include "Actor.h"
 #include "SpriteComponent.h"
@@ -103,7 +103,7 @@ bool Game::Initialize()
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForSDLRenderer(mWindow, mRenderer);
-	ImGui_ImplSDLRenderer_Init(mRenderer);
+	ImGui_ImplSDLRenderer2_Init(mRenderer);
 		
 	//-----------  init SDL-Image library  ---------
 	IMG_Init(IMG_INIT_PNG);
@@ -226,7 +226,7 @@ void Game::GenerateOutput()
 	}
 
 	// Start the Dear ImGui frame
-	ImGui_ImplSDLRenderer_NewFrame();
+	ImGui_ImplSDLRenderer2_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
@@ -267,7 +267,7 @@ void Game::GenerateOutput()
 	}
 
 	ImGui::Render();
-	ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+	ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), mRenderer);
 
 	// Swap front buffer and back buffer
 	SDL_RenderPresent(mRenderer);
@@ -291,7 +291,7 @@ void Game::Shutdown()
 	IMG_Quit();
 
 	//-------- Cleanup Imgui resources  ------------
-	ImGui_ImplSDLRenderer_Shutdown();
+	ImGui_ImplSDLRenderer2_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 
