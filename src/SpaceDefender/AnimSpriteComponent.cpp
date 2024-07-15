@@ -12,7 +12,7 @@
 AnimSpriteComponent::AnimSpriteComponent(Actor* owner, int drawOrder)
 	:SpriteComponent(owner, drawOrder)
 	, mCurrFrame(0.0f)
-	, mAnimFPS(24.0f)
+	, mAnimFPS(12.0f)
 {
 }
 
@@ -27,9 +27,9 @@ void AnimSpriteComponent::Update(float deltaTime)
 		mCurrFrame += mAnimFPS * deltaTime;
 		
 		// Wrap current frame if needed
-		while (mCurrFrame >= mAnimTextures.size())
+		while (mCurrFrame >= mActiveAnim.endIdx+1)
 		{
-			mCurrFrame -= mAnimTextures.size();
+			mCurrFrame = mActiveAnim.startIdx;
 		}
 
 		// Set the current texture
@@ -44,6 +44,25 @@ void AnimSpriteComponent::SetAnimTextures(const std::vector<SDL_Texture*>& textu
 	{
 		// Set the active texture to first frame
 		mCurrFrame = 0.0f;
-		SetTexture(mAnimTextures[0]);
+		SetTexture(mAnimTextures[0]);  // TODO: check if this is compatible with the multiple-animations feature.
 	}
+}
+
+void AnimSpriteComponent::DefineAnimation(std::string name, int startIdx, int endIdx, bool isLooping)
+{
+	AnimDef tmpData {
+		name,
+		startIdx,
+		endIdx,
+		isLooping
+	};
+	mAnimations.push_back(tmpData);
+}
+
+void AnimSpriteComponent::SetCurrentAnim(std::string anim_name)
+{
+	auto iter = std::find(mAnimations.begin(), mAnimations.end(), anim_name);
+	if (iter != mAnimations.end())
+		mActiveAnim = *iter;
+	mCurrFrame = (*iter).startIdx;
 }

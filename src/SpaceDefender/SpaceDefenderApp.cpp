@@ -15,6 +15,7 @@
 #include "SpriteComponent.h"
 #include "BGSpriteComponent.h"
 #include "Ship.h"
+#include <algorithm>
 
 
 Game::Game()

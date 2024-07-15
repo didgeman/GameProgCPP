@@ -8,6 +8,8 @@
 
 #pragma once
 #include "Actor.h"
+#include "AnimSpriteComponent.h"
+
 class Ship : public Actor
 {
 public:
@@ -19,4 +21,5 @@ public:
 private:
 	float mRightSpeed;
 	float mDownSpeed;
+	AnimSpriteComponent* mAnimComp;
 };

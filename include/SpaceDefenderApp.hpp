@@ -10,6 +10,7 @@
 #include "SDL.h"
 #include <vector>
 #include <unordered_map>
+#include <string>
 
 // Game class
 class Game
