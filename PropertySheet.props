@@ -2,22 +2,29 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <SDL2_INCLUDE>D:\Libs\SDL2\include</SDL2_INCLUDE>
-    <IMGUI_DIR>D:\Libs\imgui</IMGUI_DIR>
-    <SDL_IMAGE_INCLUDE>D:\Libs\SDL2_image</SDL_IMAGE_INCLUDE>
+    <SDL2_INCLUDE>C:\Libs\SDL2\include</SDL2_INCLUDE>
+    <IMGUI_DIR>C:\Libs\imgui</IMGUI_DIR>
+    <SDL_IMAGE_INCLUDE>C:\Libs\SDL2_image\include</SDL_IMAGE_INCLUDE>
+    <SDL2_DIR>C:\Libs\SDL2</SDL2_DIR>
+    <SDL2_IMAGE>C:\Libs\SDL2_Image</SDL2_IMAGE>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
     <BuildMacro Include="SDL2_INCLUDE">
       <Value>$(SDL2_INCLUDE)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="IMGUI_DIR">
       <Value>$(IMGUI_DIR)</Value>
     </BuildMacro>
     <BuildMacro Include="SDL_IMAGE_INCLUDE">
       <Value>$(SDL_IMAGE_INCLUDE)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SDL2_DIR">
+      <Value>$(SDL2_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SDL2_IMAGE">
+      <Value>$(SDL2_IMAGE)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>
