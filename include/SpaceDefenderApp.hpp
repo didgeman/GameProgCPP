@@ -29,6 +29,8 @@ public:
 	// ... and special other game objects
 	void AddSprite(class SpriteComponent* aSprite);
 	void RemoveSprite(class SpriteComponent* aSprite);
+	void CreateStarBackground();	// evtl. make used textures controllable via parameter
+	void CreateTiledBackground(); // implementation for exercise 2.3
 
 	SDL_Texture* GetTexture(const std::string& fileName);
 private:

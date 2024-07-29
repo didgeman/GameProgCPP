@@ -72,6 +72,9 @@
     <ClCompile Include="..\..\..\..\..\Libs\imgui\backends\imgui_impl_sdlrenderer2.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="src\SpaceDefender\TileMapComponent.cpp">
+      <Filter>Source Files\SpaceDefender</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SpaceDefenderApp.hpp">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\Libs\imgui\backends\imgui_impl_sdl2.h">
       <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TileMapComponent.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

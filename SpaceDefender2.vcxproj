@@ -137,7 +137,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Libs\SDL2_image\VisualC\$(Platform)\$(Configuration);D:\Libs\SDL2\VisualC\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SDL2_Image)\VisualC\$(Platform)\Release;$(SDL2_DIR)\VisualC\$(Platform)\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2_image.lib;SDL2.lib;SDL2main.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:msvcrt.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -177,6 +177,7 @@
     <ClCompile Include="src\SpaceDefender\Ship.cpp" />
     <ClCompile Include="src\SpaceDefender\SpaceDefenderApp.cpp" />
     <ClCompile Include="src\SpaceDefender\SpriteComponent.cpp" />
+    <ClCompile Include="src\SpaceDefender\TileMapComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\Libs\imgui\backends\imgui_impl_sdl2.h" />
@@ -192,6 +193,7 @@
     <ClInclude Include="include\Ship.h" />
     <ClInclude Include="include\SpaceDefenderApp.hpp" />
     <ClInclude Include="include\SpriteComponent.h" />
+    <ClInclude Include="include\TileMapComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
